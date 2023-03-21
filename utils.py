@@ -1,9 +1,7 @@
-import numpy as np
 import torch
 import torch.nn as nn
-from torch.optim import Adam
-from torch.utils.data import Dataset, DataLoader
-from sklearn.metrics import f1_score, classification_report
+from torch.utils.data import Dataset
+from sklearn.metrics import f1_score
 from tqdm import tqdm
 from IPython.display import clear_output
 import matplotlib.pyplot as plt
@@ -55,12 +53,61 @@ def draw(train_losses, test_losses, train_f1_scores, test_f1_scores):
     plt.show()
 
 
-def train(model, optimizer, epochs, train_loader, test_loader):
+def train(model, optimizer, train_loader, test_loader, epochs, saving_path, scheduler=None):
     criterion = nn.NLLLoss()
     train_losses = []
     test_losses = []
     train_f1_scores = []
     test_f1_scores = []
+    best_f1 = 0
+
+    for i in tqdm(range(epochs)):
+        train_loss_sum = 0
+        test_loss_sum = 0
+        train_f1_sum = 0
+        test_f1_sum = 0
+
+        # train
+        model.train()
+        for X, y in iter(train_loader):
+            X, y = X.to(device), y.to(device)
+            y_pred = model(X.float())
+            loss = criterion(y_pred, y)
+            train_loss_sum += loss.item()
+            train_f1_sum += f1_score(y.cpu(), torch.argmax(y_pred, dim=1).cpu(), average='macro')
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+        train_losses.append(train_loss_sum / len(train_loader))
+        train_f1_scores.append(train_f1_sum / len(train_loader))
+
+        # test
+        model.eval()
+        with torch.no_grad():
+            for X, y in iter(test_loader):
+                X, y = X.to(device), y.to(device)
+                y_pred = model(X.float())
+                loss = criterion(y_pred, y)
+                test_loss_sum += loss.item()
+                test_f1_sum += f1_score(y.cpu(), torch.argmax(y_pred, dim=1).cpu(), average='macro')
+            test_losses.append(test_loss_sum / len(test_loader))
+            test_f1_scores.append(test_f1_sum / len(test_loader))
+
+        draw(train_losses, test_losses, train_f1_scores, test_f1_scores)
+        if scheduler is not None:
+            scheduler.step()
+        if test_f1_sum > best_f1:
+            best_f1 = test_f1_sum
+            torch.save(model.state_dict(), saving_path)
+
+
+def train_with_int_input(model, optimizer, train_loader, test_loader, epochs, saving_path, scheduler=None):
+    criterion = nn.NLLLoss()
+    train_losses = []
+    test_losses = []
+    train_f1_scores = []
+    test_f1_scores = []
+    best_f1 = 0
 
     for i in tqdm(range(epochs)):
         train_loss_sum = 0
@@ -78,7 +125,7 @@ def train(model, optimizer, epochs, train_loader, test_loader):
             train_f1_sum += f1_score(y.cpu(), torch.argmax(y_pred, dim=1).cpu(), average='macro')
             optimizer.zero_grad()
             loss.backward()
-            optimizer.step()  # plus pre step here
+            optimizer.step()
         train_losses.append(train_loss_sum / len(train_loader))
         train_f1_scores.append(train_f1_sum / len(train_loader))
 
@@ -95,5 +142,8 @@ def train(model, optimizer, epochs, train_loader, test_loader):
             test_f1_scores.append(test_f1_sum / len(test_loader))
 
         draw(train_losses, test_losses, train_f1_scores, test_f1_scores)
-
-    return train_losses, test_losses, train_f1_scores, test_f1_scores
+        if scheduler is not None:
+            scheduler.step()
+        if test_f1_sum > best_f1:
+            best_f1 = test_f1_sum
+            torch.save(model.state_dict(), saving_path)
