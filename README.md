@@ -1,6 +1,4 @@
-## Maxim Koltiugin
-
-### Classification of emotional coloring into 5 levels
+# Classification of emotional coloring into 5 levels
 
 <img src="./preprocessing.png" width="800px"></img>
 
@@ -10,7 +8,7 @@ In this project I've tryed different aprroaches to preprocess text:
 - **doc2vec.** Here I'm using Navec's pre-trained embeddings, which are summed up to make up a document embedding.
 - **doc2matrix.** Same as mentioned above, but embeddings are not summed. Used for reccurent nets.
 
-## Results
+# Results
 
 ### Classic ML: average f1-scores through 5 classes
 |                                       | tf-idf | doc2idxs | doc2vec | doc2matrix |
