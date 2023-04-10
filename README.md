@@ -10,7 +10,7 @@ In this project I've tryed different aprroaches to preprocess text:
 
 # Results
 
-### Classic ML: average f1-scores through 5 classes
+## Classic ML: average f1-scores through 5 classes
 |                                       | tf-idf | doc2idxs | doc2vec | doc2matrix |
 |---------------------------------------|:------:|:--------:|:-------:|:----------:|
 |                  Tree                 |  0.65  |     -    |   0.66  |      -     |
@@ -19,7 +19,7 @@ In this project I've tryed different aprroaches to preprocess text:
 |                XGBoost                |  0.51  |     -    |   0.68  |      -     |
 | Ensemble  (tree + knn + rf + XGBoost) |    -   |     -    |   0.69  |      -     |
 
-### Neural nets: average f1-scores through 5 classes
+## Neural nets: average f1-scores through 5 classes
 |             | tf-idf | doc2idxs | doc2vec | doc2matrix |
 |-------------|:------:|:--------:|:-------:|:----------:|
 | FeedForward |  0.65  |     -    |   0.63  |      -     |
@@ -27,7 +27,7 @@ In this project I've tryed different aprroaches to preprocess text:
 |     GRU     |    -   |   0.63   |    -    |    0.57    |
 |     LSTM    |    -   |   0.63   |    -    |    0.53    |
 
-### Best model scores (random forest):
+## Best model scores (random forest):
 |                | precision | recall   | f1-score    | support |
 |:--------------:|:---------:|:--------:|:-----------:|:-------:|
 |                |           |          |             |         |
@@ -41,7 +41,7 @@ In this project I've tryed different aprroaches to preprocess text:
 |    macro avg   |   0.66    |   0.72   |     0.69    |   8020  |
 | weighted avg   |   0.76    |   0.76   |     0.76    |   8020  |
 
-## Conclusions
+# Conclusions
 - Using **doc2vec** embeddings is consistently more profitable than **tf-idf**
 - In case of recurrent networks, it is more efficient to use self-learning embeddings than pre-trained ones
 
